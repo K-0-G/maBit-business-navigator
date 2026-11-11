@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="description" content="Má Bit — a privacy-first prototype that suggests official Scottish business support connections based on your goals.">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; connect-src 'none'; img-src 'none'; object-src 'none'; form-action 'none'; base-uri 'none';">
+  <title>Má Bit · Business Navigator v0.1</title>
+  <style>
+    :root { color-scheme: dark; --bg:#091016; --panel:#101b23; --panel2:#15242d; --border:#2e4650; --text:#f0f5f5; --muted:#b2c5cb; --dim:#88a2ab; --mint:#6ce4d0; --gold:#e8c483; --blue:#8dbaf0; --ring:#e8c483; }
+    * { box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body { margin:0; background:radial-gradient(circle at 50% -13%, #18333c, transparent 45%),var(--bg); color:var(--text); font:16px/1.52 system-ui,-apple-system,Segoe UI,Roboto,sans-serif; }
+    a { color:#9cebdd; text-underline-offset:3px; }
+    a:hover { color:white; }
+    a:focus-visible, button:focus-visible, select:focus-visible, input:focus-visible { outline:3px solid var(--ring); outline-offset:3px; }
+    button, select { font:inherit; }
+    button { cursor:pointer; }
+    .skip { position:absolute;left:10px;top:-70px;padding:12px;background:white;color:#071219;z-index:50; }
+    .skip:focus {top:10px;}
+    .topbar { border-bottom:1px solid var(--border); background:#0b151bdf; }
+    .topinner {max-width:1350px; margin:auto; padding:18px 24px; display:flex;justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap;}
+    .logo { display:flex;align-items:center;gap:12px; }
+    .mark { width:44px;height:44px;border:2px solid var(--mint);border-radius:50%; display:grid;place-items:center; box-shadow:0 0 25px #6ce4d02e; font-weight:800; font-size:20px; }
+    .eyebrow { margin:0; color:var(--mint);font-size:.72rem;text-transform:uppercase;letter-spacing:.17em;font-weight:700;}
+    .brand {font-size:1.15rem;font-weight:770;letter-spacing:.02em;}
+    .topright {display:flex;align-items:center;gap:18px;font-size:.89rem;flex-wrap:wrap;}
+    .tag {border:1px solid #407665;background:#132d2b;color:#9de9ce;border-radius:24px;padding:6px 10px;font-size:.77rem;}
+    .intro { max-width:1350px;margin:0 auto;padding:38px 24px 22px; }
+    h1 {font-size:clamp(2rem,4vw,3.45rem);line-height:1.08;letter-spacing:-.04em;margin:12px 0 12px;max-width:850px;}
+    .intro p:last-child {max-width:770px;color:var(--muted);font-size:1.07rem;margin:0;}
+    .layout { max-width:1350px; margin:0 auto; padding:10px 24px 45px;display:grid;grid-template-columns:minmax(240px,310px) minmax(0,1fr);gap:22px;align-items:start; }
+    .sidebar,.block {background:var(--panel);border:1px solid var(--border);border-radius:18px;}
+    .sidebar {padding:22px;position:sticky;top:14px;}
+    .sidebar h2,.block h2 {font-size:1.2rem;margin:0 0 8px;}
+    .helper {font-size:.88rem;color:var(--muted);margin:0 0 20px;}
+    .field {margin:0 0 17px;}
+    label {display:block;font-size:.86rem;font-weight:750;margin:0 0 7px;}
+    select {width:100%;background:#172a34;color:white;border:1px solid #506976;border-radius:9px;padding:11px 13px;max-width:100%;}
+    fieldset {margin:4px 0 16px; border:0;padding:0;}
+    legend {font-size:.86rem;font-weight:750;margin:0 0 9px;}
+    .toggle {display:flex;align-items:flex-start;gap:11px;background:var(--panel2);padding:11px 12px;border-radius:9px;margin:0 0 8px;}
+    .toggle input {width:19px;height:19px;accent-color:var(--mint);margin:2px 0 0;flex:none;}
+    .toggle span {font-size:.85rem;font-weight:500;color:var(--text);}
+    .privacy-note {margin-top:18px;border-top:1px solid var(--border);padding-top:15px; font-size:.81rem;color:var(--muted);}
+    .content {min-width:0;display:grid;gap:20px;}
+    .content > .block {min-width:0;}
+    .block {padding:24px;}
+    .section-head {display:flex;justify-content:space-between;gap:16px;align-items:start;flex-wrap:wrap;margin-bottom:17px;}
+    .section-head p {margin:5px 0 0;color:var(--muted);font-size:.9rem;max-width:640px;}
+    .mini {font-size:.72rem;color:var(--mint);letter-spacing:.13em;text-transform:uppercase;font-weight:750;}
+    .cards {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;}
+    .rec {border:1px solid #3b5863;background:linear-gradient(150deg,#1b3138,#122027);border-radius:13px;padding:17px;min-width:0;display:flex;flex-direction:column;gap:10px;}
+    .rank {font-size:.69rem;text-transform:uppercase;letter-spacing:.12em;color:var(--gold);font-weight:800;}
+    .rec h3 {font-size:1.05rem;line-height:1.3;margin:0;}
+    .rec p {font-size:.84rem;line-height:1.48;color:var(--muted);margin:0;flex:1;}
+    .action {display:inline-flex;gap:6px;align-items:center;color:#0b2529;background:var(--mint);border-radius:8px;padding:9px 12px;text-decoration:none;font-weight:750;font-size:.83rem;justify-content:center;}
+    .action:hover {background:#a6faea;color:#071819;}
+    .map-shell {padding:6px 0 0;overflow-x:auto;}
+    .map {height:415px;position:relative;min-width:600px;background:radial-gradient(ellipse at center,#18343a 0%,#101b23 64%);border:1px solid #263e49;border-radius:15px;overflow:hidden;}
+    .wires {position:absolute;inset:0;width:100%;height:100%;pointer-events:none;}
+    .hub {position:absolute;z-index:2;width:142px;height:142px;left:50%;top:50%;transform:translate(-50%,-50%);border:2px solid var(--mint);border-radius:50%;background:#163139;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:15px;box-shadow:0 0 70px #6ce4d01b;}
+    .hub strong {font-size:1.05rem;}
+    .hub small {color:var(--muted);font-size:.73rem;line-height:1.3;}
+    .neuron {position:absolute;transform:translate(-50%,-50%);z-index:3;width:132px;min-height:66px;border:1px solid #61858f;border-radius:13px;padding:9px;background:#17303a;color:white;font-size:.75rem;line-height:1.25;text-align:center;transition:background .16s,border-color .16s;box-shadow:0 8px 20px #02060866;}
+    .neuron span {display:block;font-size:.59rem;letter-spacing:.06em;color:var(--mint);text-transform:uppercase;margin-top:5px;}
+    .neuron:hover,.neuron[aria-pressed="true"] {background:#28606a;border-color:var(--gold);}
+    .map-caption {color:var(--muted);font-size:.82rem;margin:10px 0 0;}
+    .service-list {display:grid;gap:9px;}
+    .service {display:grid;grid-template-columns:1fr auto;align-items:center;gap:10px;border:1px solid #324a55;border-radius:12px;padding:13px 15px;background:#12232c;}
+    .service h3 {font-size:.97rem;margin:0 0 3px;line-height:1.3;}
+    .service p {font-size:.8rem;color:var(--muted);margin:0;}
+    .service .org {font-size:.72rem;color:var(--mint);margin-bottom:5px;}
+    .service-actions {display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end;}
+    .service-actions a {border:1px solid #51737d;border-radius:7px;padding:7px 9px;text-decoration:none;font-size:.78rem;white-space:nowrap;}
+    .review {border:1px solid #54706f;background:#193039;border-radius:7px;color:white;padding:7px 9px;font-size:.78rem;}
+    .review[aria-pressed="true"] {background:#184f42;border-color:var(--mint);color:#b2f5d7;}
+    .status {display:inline-flex;gap:5px;font-size:.7rem;color:var(--gold);}
+    .soft-button {background:transparent;color:var(--text);border:1px solid #58737c;padding:10px 13px;border-radius:9px;}
+    .soft-button:hover {background:#25404b;}
+    .buttonrow {display:flex;gap:10px;flex-wrap:wrap;margin-top:15px;}
+    .privacy-grid {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px;}
+    .privacy-grid article {background:#162a33;padding:15px;border-radius:12px;}
+    .privacy-grid h3 {font-size:.91rem;margin:0 0 5px;color:var(--mint);}
+    .privacy-grid p {font-size:.8rem;margin:0;color:var(--muted);}
+    footer {max-width:1350px;margin:auto;padding:0 24px 36px;color:var(--muted);font-size:.78rem;}
+    .sr-only {position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
+    @media(max-width:1080px){.cards{grid-template-columns:1fr}.rec{min-height:unset}.privacy-grid{grid-template-columns:1fr}.service{grid-template-columns:1fr}.service-actions{justify-content:flex-start}}
+    @media(max-width:760px){.layout{grid-template-columns:1fr;padding:8px 15px 35px}.sidebar{position:static}.intro{padding:26px 15px 18px}.topinner{padding:14px 15px}.block{padding:17px}.map{min-width:560px}.brand{font-size:1rem}.topright{gap:9px}}
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.neuron{transition:none}}
+  </style>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to your recommendations</a>
+  <header class="topbar"><div class="topinner">
+    <div class="logo"><div class="mark" aria-hidden="true">M</div><div><p class="eyebrow">KÖG Network · Proof of concept</p><div class="brand">Má Bit / Business Navigator</div></div></div>
+    <div class="topright"><span class="tag">No sign-in · No tracking scripts</span><a href="https://www.mygov.scot/browse/business" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer">Official business guidance ↗</a></div>
+  </div></header>
+  <div class="intro"><p class="eyebrow">Find the right connection, not every connection</p><h1>Start a business.<br>Know what matters next.</h1><p>Choose broad business goals to see Scottish and UK public services in a useful order. This independent prototype is not affiliated with the Scottish Government and cannot submit applications.</p></div>
+  <div class="layout">
+    <aside class="sidebar" aria-labelledby="setup-title">
+      <h2 id="setup-title">Your route</h2><p class="helper">Change a choice to reorganise the network. These settings stay in this open page only.</p>
+      <div class="field"><label for="stage">Where are you now?</label><select id="stage"><option value="idea">Exploring an idea</option><option value="start" selected>Getting started</option><option value="trade">Already trading</option><option value="contracts">Looking for public contracts</option><option value="grow">Developing or expanding</option></select></div>
+      <div class="field"><label for="structure">Business structure</label><select id="structure"><option value="unknown" selected>Not decided</option><option value="sole">Sole trader</option><option value="limited">Limited company</option><option value="cic">Community interest company</option></select></div>
+      <div class="field"><label for="sector">Type of business</label><select id="sector"><option value="general">General / undecided</option><option value="it" selected>IT / digital services</option><option value="physical">Premises / repair / retail</option><option value="social">Community / social enterprise</option></select></div>
+      <div class="field"><label for="region">Broad local area</label><select id="region"><option value="scotland" selected>Scotland (not specified)</option><option value="argyll">Argyll &amp; Bute</option></select></div>
+      <fieldset><legend>Optional guidance categories</legend>
+        <label class="toggle"><input id="benefits" type="checkbox"><span>Show Universal Credit and self-employment guidance</span></label>
+        <label class="toggle"><input id="access" type="checkbox"><span>Show workplace accessibility support</span></label>
+      </fieldset>
+      <button type="button" class="soft-button" id="reset">Reset all choices</button>
+      <div class="privacy-note"><strong>Privacy by default.</strong> This demo does not send your selections to KÖG, use cookies or store progress in your browser. The website host may process standard access logs. Opening an official link takes you to that service.</div>
+    </aside>
+    <main id="main" class="content">
+      <section class="block" aria-labelledby="next-title">
+        <div class="section-head"><div><div class="mini">01 / Recommended pathway</div><h2 id="next-title">Your next three connections</h2><p id="summary" aria-live="polite">Choosing your route…</p></div></div>
+        <div class="cards" id="top-results"></div>
+      </section>
+      <section class="block" aria-labelledby="map-title">
+        <div class="section-head"><div><div class="mini">02 / Explore relationships</div><h2 id="map-title">The service network</h2><p>Choose a neuron to highlight its explanation below. The lines represent suggested navigation relationships, not shared government databases.</p></div></div>
+        <div class="map-shell"><div class="map" id="network-map" aria-label="Interactive connections around Má Bit"><svg class="wires" id="wires" aria-hidden="true" focusable="false"></svg><div class="hub"><strong>Má Bit</strong><small>Public-service navigator</small></div></div></div>
+        <p class="map-caption">The network diagram can scroll horizontally on small screens. All services are also available in the accessible list below.</p>
+      </section>
+      <section class="block" aria-labelledby="list-title">
+        <div class="section-head"><div><div class="mini">03 / Official destinations</div><h2 id="list-title">Connections and next actions</h2><p>Services are grouped by relevance to your route. Links open official websites; Má Bit does not access their accounts or records.</p></div><span id="count" class="tag" aria-live="polite"></span></div>
+        <div id="services" class="service-list"></div>
+        <div class="buttonrow"><button type="button" class="soft-button" id="more">Show more connections</button><button type="button" class="soft-button" id="export">Export a text checklist</button></div>
+        <p class="map-caption">“Mark reviewed” is a local convenience, not a record that an application was completed. The exported file is stored wherever your device saves it.</p>
+      </section>
+      <section class="block" aria-labelledby="privacy-title"><div class="mini">04 / Design safeguards</div><h2 id="privacy-title">Privacy and boundaries</h2>
+        <div class="privacy-grid"><article><h3>Minimum information</h3><p>No name, email, postcode, National Insurance number, company registration number or documents are requested.</p></article><article><h3>Local calculations</h3><p>Recommendations are generated using JavaScript in this page. There is no database, API, analytics integration, cookie or browser storage.</p></article><article><h3>Clear hand-offs</h3><p>Every destination is an external official link. Only an authorised service can confirm eligibility, accept an application or report case status.</p></article></div>
+      </section>
+    </main>
+  </div>
+  <footer>Má Bit / KáraKÖG · Independent concept v0.1 · Last content review: 11 November 2026. Guidance and programme eligibility can change. Verify requirements on each official website before acting. The Scottish Government does not endorse this prototype.</footer>
+<script>
+(() => {
+  'use strict';
+  const $ = id => document.getElementById(id);
+  const ids = ['stage','structure','sector','region','benefits','access'];
+  const defaults = {stage:'start',structure:'unknown',sector:'it',region:'scotland',benefits:false,access:false};
+  const reviewed = new Set();
+  let showAll = false, current = [], selectedId = null;
+  const services = [
+    {id:'gateway',title:'Business Gateway',org:'Scottish local business support',url:'https://www.bgateway.com/',area:'Advice',stage:{idea:110,start:103,trade:75,contracts:73,grow:85},why:'Free business planning, specialist advice, workshops and local referrals.',next:'Choose an adviser or find your local team.'},
+    {id:'structure-guide',title:'Choose a business structure',org:'GOV.UK',url:'https://www.gov.uk/set-up-business',area:'Registration',stage:{idea:95,start:102,trade:30,contracts:20,grow:15},why:'Compare sole trader, limited company and partnership responsibilities before registering.',next:'Compare legal structure, tax, liability and administration.'},
+    {id:'sole',title:'Register as a sole trader',org:'HM Revenue & Customs',url:'https://www.gov.uk/become-sole-trader/register-sole-trader',area:'Registration',stage:{idea:47,start:105,trade:72,contracts:48,grow:26},why:'Find when you must register for Self Assessment and what records to maintain.',next:'Check whether and when Self Assessment registration applies.',only:['sole','unknown']},
+    {id:'limited',title:'Register a limited company',org:'Companies House',url:'https://www.gov.uk/set-up-limited-company',area:'Registration',stage:{idea:47,start:105,trade:62,contracts:40,grow:20},why:'Review incorporation, directors, registered office, identity verification and tax steps.',next:'Check identity, address, company name and incorporation requirements.',only:['limited','unknown']},
+    {id:'cic',title:'Set up a social enterprise / CIC',org:'GOV.UK / CIC Regulator',url:'https://www.gov.uk/set-up-a-social-enterprise',area:'Registration',stage:{idea:80,start:109,trade:63,contracts:47,grow:44},why:'Understand the community interest test, asset lock and alternatives to a CIC.',next:'Decide whether the business needs a CIC, charity or other structure.',only:['cic'],sectorBoost:{social:12}},
+    {id:'funding',title:'Find Business Support',org:'Scottish public-sector directory',url:'https://findbusinesssupport.gov.scot/',area:'Advice',stage:{idea:91,start:87,trade:85,contracts:66,grow:109},why:'Browse public-sector advice, events, grants and finance; funding is not guaranteed.',next:'Check support by business stage and specific eligibility.'},
+    {id:'local',title:'Check business licences',org:'mygov.scot / local councils',url:'https://www.mygov.scot/business-licences',area:'Compliance',stage:{idea:36,start:77,trade:79,contracts:47,grow:52},why:'Some business activities need local permissions or statutory licences.',next:'Check whether your exact activity requires a licence.',sectorBoost:{physical:22,social:4}},
+    {id:'privacy',title:'Check data protection obligations',org:'Information Commissioner’s Office',url:'https://www.gov.uk/data-protection-register-notify-ico-personal-data',area:'Compliance',stage:{idea:32,start:78,trade:100,contracts:82,grow:77},why:'If processing personal information, check UK GDPR duties and whether an ICO fee applies.',next:'Check the fee exemption tool and prepare a proportionate privacy notice.',sectorBoost:{it:13}},
+    {id:'vat',title:'Understand VAT registration',org:'HM Revenue & Customs',url:'https://www.gov.uk/register-for-vat',area:'Compliance',stage:{idea:12,start:43,trade:74,contracts:59,grow:81},why:'The general UK registration threshold is £90,000 taxable turnover; other rules and voluntary registration can apply.',next:'Check rolling taxable turnover and your VAT position.'},
+    {id:'workspace',title:'Check premises and insurance',org:'GOV.UK / local council',url:'https://www.gov.uk/run-business-from-home',area:'Compliance',stage:{idea:18,start:68,trade:79,contracts:50,grow:72},why:'Check lease or landlord permission, insurance, planning and possible business rates.',next:'Confirm whether the intended workspace can legally host this business.',sectorBoost:{physical:24}},
+    {id:'pcs',title:'Public Contracts Scotland',org:'Scottish Government procurement',url:'https://www.publiccontractsscotland.gov.uk/',area:'Contracts',stage:{idea:24,start:55,trade:77,contracts:116,grow:88},why:'Search public contracts, configure alerts and maintain a Supplier Finder profile.',next:'Review tender categories and match CPV codes to your services.',sectorBoost:{it:7}},
+    {id:'sdp',title:'Supplier Development Programme',org:'Scottish public-sector partnership',url:'https://www.sdpscotland.co.uk/',area:'Contracts',stage:{idea:32,start:61,trade:70,contracts:111,grow:84},why:'Free supplier training covering tender preparation and public-sector bidding.',next:'Choose an introductory PCS or tender-writing session.'},
+    {id:'hie',title:'Highlands and Islands Enterprise',org:'Scottish enterprise agency',url:'https://www.hie.co.uk/our-region/our-areas/argyll-islands/',area:'Growth',stage:{idea:46,start:73,trade:82,contracts:58,grow:111},why:'Regional business and community development, investment advice and relevant programmes.',next:'Check available support and eligibility with the Argyll and the Islands team.',region:'argyll'},
+    {id:'enterprise',title:'Explore enterprise agencies',org:'mygov.scot',url:'https://www.mygov.scot/business-support-organisations',area:'Growth',stage:{idea:38,start:56,trade:67,contracts:54,grow:96},why:'Identify the enterprise agency relevant to your region and business development plans.',next:'Check regional coverage before approaching an agency.',region:'scotland'},
+    {id:'skills',title:'Business skills and staff',org:'Skills Development Scotland / mygov.scot',url:'https://www.mygov.scot/business-support-organisations',area:'Growth',stage:{idea:20,start:40,trade:62,contracts:48,grow:92},why:'Explore training, recruitment and employer support as the business grows.',next:'Identify skill gaps and appropriate development support.'},
+    {id:'uc',title:'Self-employment and Universal Credit',org:'Department for Work and Pensions',url:'https://www.gov.uk/government/publications/universal-credit-for-the-self-employed/universal-credit-and-self-employment-quick-guide',area:'Personal support',stage:{idea:86,start:116,trade:115,contracts:90,grow:78},why:'Understand reporting of self-employed work, monthly income and expenses and possible start-up period.',next:'Check the reporting rules and speak to your work coach if relevant.',toggle:'benefits'},
+    {id:'access',title:'Access to Work',org:'Department for Work and Pensions',url:'https://www.gov.uk/access-to-work/eligibility',area:'Personal support',stage:{idea:45,start:91,trade:87,contracts:63,grow:82},why:'Practical workplace assistance may be available, including to eligible self-employed people. It is not general business startup funding.',next:'Review the current self-employment turnover and other eligibility conditions.',toggle:'access'}
+  ];
+  const text = (tag,txt,cls) => {const el=document.createElement(tag); if(cls) el.className=cls; el.textContent=txt; return el;};
+  const external = (label,url,cls) => {const a=document.createElement('a');a.href=url;a.target='_blank';a.rel='noopener noreferrer';a.referrerPolicy='no-referrer';a.textContent=label;a.className=cls||'';return a;};
+  function filters(){return {stage:$('stage').value,structure:$('structure').value,sector:$('sector').value,region:$('region').value,benefits:$('benefits').checked,access:$('access').checked};}
+  function rank(s,f){let r=s.stage[f.stage]||0; if(s.id==='structure-guide' && f.structure!=='unknown')r-=58; if(s.id==='sole' && f.structure==='unknown')r-=38; if(s.id==='limited' && f.structure==='unknown')r-=38; if(s.sectorBoost)r+=(s.sectorBoost[f.sector]||0); if(f.sector==='social' && s.id==='cic')r+=14; if(f.stage==='contracts' && s.area==='Contracts')r+=10; return r;}
+  function available(s,f){return (!s.only||s.only.includes(f.structure))&&(!s.toggle||f[s.toggle])&&(!s.region||s.region===f.region);}
+  function list(){const f=filters();return services.filter(s=>available(s,f)).map(s=>({...s,score:rank(s,f)})).sort((a,b)=>b.score-a.score||a.title.localeCompare(b.title));}
+  function addCard(s,i,f){const card=document.createElement('article');card.className='rec';card.appendChild(text('div',String(i+1).padStart(2,'0')+' / RECOMMENDED','rank'));
+    const heading=text('h3',s.title);card.appendChild(heading);
+    const p=text('p',s.why);card.appendChild(p);
+    card.appendChild(text('p','NEXT: '+s.next));
+    card.appendChild(external('Open official service ↗',destination(s,f),'action'));return card;}
+  function destination(s,f){ if(s.id==='gateway'&&f.region==='argyll')return 'https://www.bgateway.com/local-offices/argyll-bute';return s.url;}
+  function record(s,f){const r=document.createElement('article');r.className='service';r.id='service-'+s.id;
+    const content=document.createElement('div');content.appendChild(text('div',s.org+' · '+s.area,'org'));content.appendChild(text('h3',s.title));content.appendChild(text('p',s.why+' Next: '+s.next));r.appendChild(content);
+    const actions=document.createElement('div');actions.className='service-actions';
+    const b=text('button',reviewed.has(s.id)?'✓ Reviewed':'Mark reviewed','review');b.type='button';b.setAttribute('aria-pressed',String(reviewed.has(s.id)));b.addEventListener('click',()=>{if(reviewed.has(s.id))reviewed.delete(s.id);else reviewed.add(s.id);render();});
+    actions.appendChild(b);actions.appendChild(external('Official link ↗',destination(s,f)));r.appendChild(actions);
+    if(selectedId===s.id){r.style.borderColor='var(--gold)';r.style.background='#1b3540';}return r;}
+  function drawMap(){const map=$('network-map'),svg=$('wires'); map.querySelectorAll('.neuron').forEach(x=>x.remove());while(svg.firstChild)svg.removeChild(svg.firstChild);
+    const f=filters(),items=current.slice(0,8);const w=map.clientWidth,h=map.clientHeight;svg.setAttribute('viewBox',`0 0 ${w} ${h}`);
+    const rx=Math.min(0.37*w,350),ry=Math.min(.39*h,162),cx=w/2,cy=h/2;
+    items.forEach((s,i)=>{const angle=(i/items.length)*Math.PI*2-Math.PI/2;
+      const x=cx+rx*Math.cos(angle),y=cy+ry*Math.sin(angle);
+      const line=document.createElementNS('http://www.w3.org/2000/svg','line');line.setAttribute('x1',cx);line.setAttribute('y1',cy);line.setAttribute('x2',x);line.setAttribute('y2',y);line.setAttribute('stroke',selectedId===s.id?'#e8c483':'#467782');line.setAttribute('stroke-width',selectedId===s.id?'3':'1.6');line.setAttribute('stroke-dasharray','4 6');svg.appendChild(line);
+      const node=text('button',s.title);node.className='neuron';node.type='button';node.style.left=x+'px';node.style.top=y+'px';node.setAttribute('aria-pressed',String(selectedId===s.id));node.setAttribute('aria-label','Show '+s.title+' in service list');node.appendChild(text('span',s.area));node.addEventListener('click',()=>{selectedId=s.id;showAll=true;render();$('service-'+s.id)?.scrollIntoView({block:'center',behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});});map.appendChild(node);
+    });}
+  function render(){const f=filters();current=list();
+    let stage={'idea':'exploring','start':'starting','trade':'trading','contracts':'looking for public contracts','grow':'developing a business'}[f.stage];
+    $('summary').textContent=`For someone ${stage}${f.region==='argyll'?' in Argyll & Bute':''}, these are the suggested next services. Recommendations are guidance, not a determination of legal obligations or funding eligibility.`;
+    const top=$('top-results');top.replaceChildren();current.slice(0,3).forEach((s,i)=>top.appendChild(addCard(s,i,f)));
+    const shown=showAll?current:current.slice(0,7);const full=$('services');full.replaceChildren();shown.forEach(s=>full.appendChild(record(s,f)));
+    $('count').textContent=current.length+' relevant connections';$('more').textContent=showAll?'Show fewer connections':`Show all ${current.length} connections`;
+    drawMap();}
+  ids.forEach(id=>$(id).addEventListener('change',()=>{showAll=false;selectedId=null;reviewed.clear();render();}));
+  $('reset').addEventListener('click',()=>{ids.forEach(id=>{if(typeof defaults[id]==='boolean')$(id).checked=defaults[id];else $(id).value=defaults[id];});reviewed.clear();showAll=false;selectedId=null;render();});
+  $('more').addEventListener('click',()=>{showAll=!showAll;render();});
+  $('export').addEventListener('click',()=>{const f=filters();const parts=['MÁ BIT — PERSONAL BUSINESS NAVIGATOR','Plan generated: '+new Date().toLocaleDateString('en-GB'),'','Stage: '+f.stage,'Business structure: '+f.structure,'Sector: '+f.sector,'Region: '+f.region,'Optional guidance: '+([f.benefits?'Universal Credit':null,f.access?'Access to Work':null].filter(Boolean).join('; ')||'none'),'','Checklist (a reviewed connection does not mean an application has been submitted):'];
+    current.forEach((s,i)=>parts.push(`${reviewed.has(s.id)?'[x]':'[ ]'} ${i+1}. ${s.title}\n    Why: ${s.why}\n    Next: ${s.next}\n    Link: ${destination(s,f)}`));
+    parts.push('','This is an independent guide and does not establish eligibility or legal compliance.','The website host may have ordinary access logs; your selections were not uploaded by this page.');
+    const content=parts.join('\n');const a=document.createElement('a');a.href='data:text/plain;charset=utf-8,'+encodeURIComponent(content);a.download='mabit-business-checklist.txt';document.body.appendChild(a);a.click();a.remove();});
+  let rAF=0;window.addEventListener('resize',()=>{cancelAnimationFrame(rAF);rAF=requestAnimationFrame(drawMap);});
+  render();
+})();
+</script>
+</body>
+</html>
